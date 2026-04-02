@@ -6,16 +6,16 @@ import (
 	"os"
 
 	"Orders/internal/app"
-
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	dsn := "host=localhost user=postgres password=0000 dbname=order_db sslmode=disable"
-	paymentURL := os.Getenv("PAYMENT_SERVICE_URL")
-	if paymentURL == "" {
-		paymentURL = "http://localhost:8081"
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, using defaults")
 	}
+	dsn := os.Getenv("DB_DSN")
+	paymentURL := os.Getenv("PAYMENT_SERVICE_URL")
 
 	db, err := sql.Open("postgres", dsn)
 	if err != nil {

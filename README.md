@@ -1,3 +1,5 @@
+## Payment microservice  - https://github.com/erooohaaa/PaymentsMicroserviceGo
+
 # 🛒 Order & Payment Microservices
 
 > Educational project in Go --- two microservices using Clean

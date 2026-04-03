@@ -18,7 +18,7 @@ func NewPostgresOrderRepository(db *sql.DB) *PostgresOrderRepository {
 func (r *PostgresOrderRepository) Save(ctx context.Context, o *domain.Order) error {
 	_, err := r.db.ExecContext(ctx,
 		`INSERT INTO orders (id, customer_id, item_name, amount, status)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+         VALUES ($1, $2, $3, $4, $5)`,
 		o.ID, o.CustomerID, o.ItemName, o.Amount, o.Status,
 	)
 	return err

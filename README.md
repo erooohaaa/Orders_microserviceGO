@@ -61,6 +61,17 @@ Run services:
 cd Payments && go run ./cmd/payment-service/main.go
 cd Orders && go run ./cmd/order-service/main.go
 ```
+Postman
+``` sql
+http://localhost:8080/orders
+{
+  "customer_id": "cust_1",
+  "item_name": "iPhone",
+  "amount": 50000
+}
+http://localhost:8080/orders/{id}/cancel
+POST http://localhost:8081/payments
+```
 
 ------------------------------------------------------------------------
 

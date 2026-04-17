@@ -2,7 +2,8 @@ package usecase
 
 import (
 	"context"
-	"github.com/erooohaaa/orders-generated/api"
+
+	api "github.com/erooohaaa/orders-generated"
 	"google.golang.org/grpc"
 )
 

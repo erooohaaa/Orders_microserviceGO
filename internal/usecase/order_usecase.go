@@ -1,9 +1,10 @@
 package usecase
 
 import (
-	"Orders/internal/domain"
 	"context"
 	"errors"
+
+	"Orders/internal/domain"
 
 	"github.com/google/uuid"
 )
@@ -31,7 +32,7 @@ func NewOrderUseCase(repo OrderRepository, payment PaymentGateway) *OrderUseCase
 
 func (uc *OrderUseCase) CreateOrder(ctx context.Context, customerID, itemName string, amount int64) (*domain.Order, error) {
 	if amount <= 0 {
-		return nil, errors.New("amount must be greater than 0")
+		return nil, errors.New("amount must be positive")
 	}
 
 	order := &domain.Order{
@@ -48,7 +49,6 @@ func (uc *OrderUseCase) CreateOrder(ctx context.Context, customerID, itemName st
 
 	_, payStatus, err := uc.payment.Authorize(ctx, order.ID, order.Amount)
 	if err != nil {
-
 		_ = uc.repo.UpdateStatus(ctx, order.ID, domain.StatusFailed)
 		order.Status = domain.StatusFailed
 		return nil, ErrGatewayUnavailable
@@ -73,7 +73,7 @@ func (uc *OrderUseCase) CancelOrder(ctx context.Context, id string) error {
 		return err
 	}
 	if !order.CanBeCancelled() {
-		return errors.New("only Pending orders can be cancelled")
+		return errors.New("only pending orders can be cancelled")
 	}
 	return uc.repo.UpdateStatus(ctx, id, domain.StatusCancelled)
 }

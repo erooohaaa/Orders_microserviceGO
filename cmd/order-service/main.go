@@ -14,7 +14,7 @@ import (
 
 func main() {
 	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file")
+		log.Println("No .env file found, using environment")
 	}
 
 	db, err := sql.Open("postgres", os.Getenv("DB_DSN"))
@@ -23,11 +23,9 @@ func main() {
 	}
 	defer db.Close()
 
-	paymentGRPCAddr := os.Getenv("PAYMENT_GRPC_ADDR") // Добавь в .env: PAYMENT_GRPC_ADDR=localhost:50051
-
+	paymentGRPCAddr := os.Getenv("PAYMENT_GRPC_ADDR")
 	application := app.New(db, paymentGRPCAddr)
 
-	// 1. Запуск REST API (для пользователей) в фоне
 	go func() {
 		log.Println("Order REST API listening on :8080")
 		if err := application.HTTPServer.ListenAndServe(); err != nil {
@@ -35,14 +33,17 @@ func main() {
 		}
 	}()
 
-	// 2. Запуск gRPC сервера (для стриминга обновлений)
-	grpcPort := "50052"
-	lis, err := net.Listen("tcp", ":"+grpcPort)
-	if err != nil {
-		log.Fatalf("failed to listen gRPC: %v", err)
+	grpcPort := os.Getenv("ORDER_GRPC_PORT")
+	if grpcPort == "" {
+		grpcPort = "50052"
 	}
 
-	log.Printf("Order gRPC Streaming Service listening on %v", grpcPort)
+	lis, err := net.Listen("tcp", ":"+grpcPort)
+	if err != nil {
+		log.Fatalf("failed to listen on gRPC port: %v", err)
+	}
+
+	log.Printf("Order gRPC streaming service listening on :%s", grpcPort)
 	if err := application.GRPCServer.Serve(lis); err != nil {
 		log.Fatalf("gRPC server error: %v", err)
 	}
